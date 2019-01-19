@@ -3,10 +3,14 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class BufferedImageLoader {
-    BufferedImage image;
+
+    private BufferedImageLoader() {
+
+    }
 
 
-    public BufferedImage loadBufferedImage(String path) {
+    public static BufferedImage loadBufferedImage(String path) {
+        BufferedImage image = null;
         try {
             image = ImageIO.read(BufferedImageLoader.class.getResource(path + ".png"));
         } catch (IOException e) {

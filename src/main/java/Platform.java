@@ -5,28 +5,21 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.ArrayList;
 
-public class Platform extends JPanel implements ActionListener {
-    private static ArrayList<RectangleImage> level1Platforms;
-    private static ArrayList<RectangleImage> level2Platforms;
-    private static ArrayList<RectangleImage> level3Platforms;
-    private static ArrayList<RectangleImage> level4Platforms;
-    private static ArrayList<RectangleImage> level5Platforms;
-    private static ArrayList<RectangleImage> level6Platforms;
-    private static ArrayList<RectangleImage> level7Platforms;
-    private static ArrayList<RectangleImage> level8Platforms;
-    private static ArrayList<RectangleImage> level9Platforms;
-    private static float platformxVel;
+public class Platform {
+    private ArrayList<RectangleImage> level1Platforms;
+    private ArrayList<RectangleImage> level2Platforms;
+    private ArrayList<RectangleImage> level3Platforms;
+    private ArrayList<RectangleImage> level4Platforms;
+    private ArrayList<RectangleImage> level5Platforms;
+    private ArrayList<RectangleImage> level6Platforms;
+    private ArrayList<RectangleImage> level7Platforms;
+    private ArrayList<RectangleImage> level8Platforms;
+    private ArrayList<RectangleImage> level9Platforms;
+    private float platformxVel;
     private Dimension resolution = Toolkit.getDefaultToolkit().getScreenSize();
     private double screenWidth = resolution.width;
-    private Image playerImage;
-    private FPS fps = new FPS();
-    private LevelStateManager levelState;
-    private GameStateManager gameState;
-    private double platformX;
 
     public Platform() {
-        levelState = new LevelStateManager();
-        gameState = new GameStateManager();
         //level 1
         level1Platforms = new ArrayList<>();
         level1Platforms.add(new RectangleImage(GameImage.getImage("platform"), 0.4f, 0.8f, 0.1f, 0.04f));
@@ -68,20 +61,20 @@ public class Platform extends JPanel implements ActionListener {
         return platformxVel;
     }
 
-    public void renderPlatforms(Graphics g) {
+    public void renderPlatforms(Graphics g, ActionListener imageObserver, LevelStateManager levelState) {
         Graphics2D g2 = (Graphics2D) g;
-        for (RectangleImage platforms : getPlatformLevels()) {
-            platforms.draw(g2, this);
+        for (RectangleImage platforms : getPlatformLevels(levelState)) {
+            platforms.draw(g2, imageObserver);
         }
     }
 
-    public void actionPerformed(ActionEvent e) {
-        for (RectangleImage platforms : getPlatformLevels()) {
+    public void update(LevelStateManager levelState) {
+        for (RectangleImage platforms : getPlatformLevels(levelState)) {
             platforms.getRectangle().x += platformxVel;
         }
     }
 
-    public ArrayList<RectangleImage> getPlatformLevels() {
+    public ArrayList<RectangleImage> getPlatformLevels(LevelStateManager levelState) {
         ArrayList<RectangleImage> stagePlatforms = null;
         switch (levelState.getState()) {
             case LEVEL_1:
@@ -145,7 +138,7 @@ public class Platform extends JPanel implements ActionListener {
         }
     }
 
-    public void savePlatforms() {
+    public void savePlatforms(LevelStateManager levelState) {
         File outputFile;
         BufferedWriter outputWriter;
 
@@ -153,7 +146,7 @@ public class Platform extends JPanel implements ActionListener {
             outputFile = new File("save platforms.txt");
             outputWriter = new BufferedWriter(new FileWriter(outputFile));
 
-            for (RectangleImage platforms : getPlatformLevels()) {
+            for (RectangleImage platforms : getPlatformLevels(levelState)) {
                 outputWriter.write(Double.toString(platforms.getRectangle().x / screenWidth) + "\n");
             }
 
@@ -163,7 +156,7 @@ public class Platform extends JPanel implements ActionListener {
         }
     }
 
-    public void loadPlatforms() {
+    public void loadPlatforms(LevelStateManager levelState) {
         File inputFile;
         BufferedReader inputReader;
 
@@ -171,7 +164,7 @@ public class Platform extends JPanel implements ActionListener {
             inputFile = new File("save platforms.txt");
             inputReader = new BufferedReader(new FileReader(inputFile));
 
-            for (RectangleImage platforms : getPlatformLevels()) {
+            for (RectangleImage platforms : getPlatformLevels(levelState)) {
                 platforms.getRectangle().x = (int) (Double.parseDouble(inputReader.readLine()) * screenWidth);
             }
 

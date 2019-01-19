@@ -1,10 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.ImageObserver;
 
-public class Menu extends JPanel implements ActionListener, MouseListener, KeyListener {
-    private GameStateManager gameState;
-    private LevelStateManager levelState;
+public class Menu {
     private boolean showMainButtons = true;
     private boolean showStages = false;
 
@@ -16,22 +15,10 @@ public class Menu extends JPanel implements ActionListener, MouseListener, KeyLi
 
     private RectangleImage menuBackground;
 
-    private Platform platform;
-    private EnemyBot enemyBot;
-    private Background background;
     private Save save;
-    private Dialogue dialogue;
-    private AutoSave autoSave;
 
     public Menu() {
-        gameState = new GameStateManager();
-        levelState = new LevelStateManager();
-        platform = new Platform();
-        enemyBot = new EnemyBot();
-        background = new Background();
         save = new Save();
-        dialogue = new Dialogue();
-        autoSave = new AutoSave();
 
         menuBackground = new RectangleImage(GameImage.getImage("background"), 0.0f, 0.0f, 1.0f, 1.0f);
 
@@ -42,17 +29,17 @@ public class Menu extends JPanel implements ActionListener, MouseListener, KeyLi
         stage2 = new RectangleImage(GameImage.getImage("menu/stage_1"), 0.45f, 0.3f, 0.1f, 0.1f);
     }
 
-    public void renderMenu(Graphics g) {
+    public void renderMenu(Graphics g, ActionListener imageObserver) {
         Graphics2D g2 = (Graphics2D) g;
-        menuBackground.draw(g2, this);
+        menuBackground.draw(g2, imageObserver);
         if (showMainButtons) {
-            continueButton.draw(g2, this);
-            exit.draw(g2, this);
-            selectStage.draw(g2, this);
+            continueButton.draw(g2, imageObserver);
+            exit.draw(g2, imageObserver);
+            selectStage.draw(g2, imageObserver);
         }
         if (showStages) {
-            stage1.draw(g2, this);
-            stage2.draw(g2, this);
+            stage1.draw(g2, imageObserver);
+            stage2.draw(g2, imageObserver);
         }
     }
 
@@ -63,28 +50,18 @@ public class Menu extends JPanel implements ActionListener, MouseListener, KeyLi
                 my >= rectangleImage.getRectangle().y && my <= rectangleImage.getRectangle().y + rectangleImage.getRectangle().height;
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed(MouseEvent e, Game game) {
         if (showMainButtons) {
             //continue
             if (isOnButton(continueButton, e)) {
-                gameState.setState(GameState.IN_GAME);
-                levelState.setState(LevelState.LEVEL_1);
-                levelState.loadLevelState();
+                game.getGameState().setState(GameState.IN_GAME);
+                game.getLevelState().setState(LevelState.LEVEL_1);
+                game.getLevelState().loadLevelState();
                 save.loadFile("save player.txt");
                 Player.loadPlayer = true;
-                enemyBot.loadEnemyBots();
-                platform.loadPlatforms();
-                background.loadBackground();
+                game.getEnemyBot().loadEnemyBots(game.getLevelState());
+                game.getPlatform().loadPlatforms(game.getLevelState());
+                game.getGameBackground().loadBackground(game.getLevelState());
             }
             //select stage
             if (isOnButton(selectStage, e)) {
@@ -99,51 +76,25 @@ public class Menu extends JPanel implements ActionListener, MouseListener, KeyLi
         if (showStages) {
             //stage 1
             if (isOnButton(stage1, e)) {
-                gameState.setState(GameState.IN_GAME);
-                levelState.setState(LevelState.LEVEL_1);
-                enemyBot.addLevel1Enemies();
-                dialogue.addLevel1Dialogues();
-                autoSave.addLevel1Checkpoints();
+                game.getGameState().setState(GameState.IN_GAME);
+                game.getLevelState().setState(LevelState.LEVEL_1);
+                game.getEnemyBot().addLevel1Enemies(game.getLevelState());
+                game.getDialogue().addLevel1Dialogues();
+                game.getAutoSave().addLevel1Checkpoints();
             }
             //stage 2
             if (isOnButton(stage2, e)) {
-                gameState.setState(GameState.IN_GAME);
-                levelState.setState(LevelState.LEVEL_2);
-                enemyBot.addLevel2Enemies();
+                game.getGameState().setState(GameState.IN_GAME);
+                game.getLevelState().setState(LevelState.LEVEL_2);
+                game.getEnemyBot().addLevel2Enemies(game.getLevelState());
             }
         }
     }
 
-    @Override
-    public void mouseReleased(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ESCAPE && !showMainButtons) {
             showMainButtons = true;
             showStages = false;
         }
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-
     }
 }

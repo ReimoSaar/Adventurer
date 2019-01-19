@@ -2,29 +2,26 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.ImageObserver;
 import java.io.*;
 import java.util.ArrayList;
 
-public class Background extends JPanel implements ActionListener {
+public class Background {
 
     private Dimension resolution = Toolkit.getDefaultToolkit().getScreenSize();
     private double screenWidth = resolution.width;
     private int screenHeight = resolution.height;
-    private static ArrayList<RectangleImage> level1Background;
-    private static ArrayList<RectangleImage> level2Background;
-    private static ArrayList<RectangleImage> level3Background;
-    private static ArrayList<RectangleImage> level4Background;
-    private static ArrayList<RectangleImage> level5Background;
-    private static ArrayList<RectangleImage> level6Background;
-    private static ArrayList<RectangleImage> level7Background;
-    private static ArrayList<RectangleImage> level8Background;
-    private static ArrayList<RectangleImage> level9Background;
-    private Platform platform;
-    private LevelStateManager levelState;
+    private ArrayList<RectangleImage> level1Background;
+    private ArrayList<RectangleImage> level2Background;
+    private ArrayList<RectangleImage> level3Background;
+    private ArrayList<RectangleImage> level4Background;
+    private ArrayList<RectangleImage> level5Background;
+    private ArrayList<RectangleImage> level6Background;
+    private ArrayList<RectangleImage> level7Background;
+    private ArrayList<RectangleImage> level8Background;
+    private ArrayList<RectangleImage> level9Background;
 
     public Background() {
-        platform = new Platform();
-        levelState = new LevelStateManager();
         level1Background = new ArrayList<>();
         level2Background = new ArrayList<>();
         level3Background = new ArrayList<>();
@@ -46,17 +43,16 @@ public class Background extends JPanel implements ActionListener {
         return backgounds;
     }
 
-    public void renderBackground(Graphics g) {
+    public void renderBackground(Graphics g, ActionListener imageObserver, LevelStateManager levelState) {
         Graphics2D g2 = (Graphics2D) g;
-        for (RectangleImage backgrounds : getAllBackgrounds()) {
-            backgrounds.draw(g2, this);
+        for (RectangleImage backgrounds : getAllBackgrounds(levelState)) {
+            backgrounds.draw(g2, imageObserver);
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        for (RectangleImage backgrounds : getAllBackgrounds()) {
-            backgrounds.getRectangle().x += Math.round(platform.getxVel() / 2);
+    public void update(Game game) {
+        for (RectangleImage backgrounds : getAllBackgrounds(game.getLevelState())) {
+            backgrounds.getRectangle().x += Math.round(game.getPlatform().getxVel() / 2);
             
             if (backgrounds.getRectangle().x + backgrounds.getRectangle().width == 0) {
                 backgrounds.getRectangle().x = (int) screenWidth;
@@ -64,7 +60,7 @@ public class Background extends JPanel implements ActionListener {
         }
     }
 
-    public ArrayList<RectangleImage> getAllBackgrounds() {
+    public ArrayList<RectangleImage> getAllBackgrounds(LevelStateManager levelState) {
         ArrayList<RectangleImage> backgounds = null;
         switch (levelState.getState()) {
             case LEVEL_1:
@@ -128,7 +124,7 @@ public class Background extends JPanel implements ActionListener {
         }
     }
 
-    public void saveBackground() {
+    public void saveBackground(LevelStateManager levelState) {
         File outputFile;
         BufferedWriter outputWriter;
 
@@ -136,7 +132,7 @@ public class Background extends JPanel implements ActionListener {
             outputFile = new File("save background.txt");
             outputWriter = new BufferedWriter(new FileWriter(outputFile));
 
-            for (RectangleImage backgrounds : getAllBackgrounds()) {
+            for (RectangleImage backgrounds : getAllBackgrounds(levelState)) {
                 outputWriter.write(Double.toString(backgrounds.getRectangle().x / screenWidth) + "\n");
             }
 
@@ -146,7 +142,7 @@ public class Background extends JPanel implements ActionListener {
         }
     }
 
-    public void loadBackground() {
+    public void loadBackground(LevelStateManager levelState) {
         File inputFile;
         BufferedReader inputReader;
 
@@ -154,7 +150,7 @@ public class Background extends JPanel implements ActionListener {
             inputFile = new File("save background.txt");
             inputReader = new BufferedReader(new FileReader(inputFile));
 
-            for (RectangleImage backgrounds : getAllBackgrounds()) {
+            for (RectangleImage backgrounds : getAllBackgrounds(levelState)) {
                 backgrounds.getRectangle().x = (int) (Double.parseDouble(inputReader.readLine()) * screenWidth);
             }
 

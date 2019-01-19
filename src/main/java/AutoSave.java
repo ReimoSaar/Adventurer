@@ -4,27 +4,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class AutoSave extends JPanel implements ActionListener {
-    private GameStateManager gameState;
+public class AutoSave {
     private Save saveGame;
-    private Platform platform;
-    private EnemyBot enemyBot;
-    private Background background;
-    private LevelStateManager levelState;
     private static ArrayList<Checkpoint> autoSaveLocations;
 
     public AutoSave() {
         saveGame = new Save();
-        platform = new Platform();
-        enemyBot = new EnemyBot();
-        background = new Background();
         autoSaveLocations = new ArrayList<>();
-        levelState = new LevelStateManager();
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        addInteraction();
+    public void update(Game game) {
+        addInteraction(game);
     }
 
     public void addLevel1Checkpoints() {
@@ -32,15 +22,15 @@ public class AutoSave extends JPanel implements ActionListener {
         autoSaveLocations.add(new Checkpoint(1.7f));
     }
 
-    public void addInteraction() {
+    public void addInteraction(Game game) {
         for (Checkpoint checkpoint : autoSaveLocations) {
-            checkpoint.rectangle.x += platform.getxVel();
+            checkpoint.rectangle.x += game.getPlatform().getxVel();
             if (Player.getPlayer().getRectangle().x >= checkpoint.rectangle.x) {
                 saveGame.saveFile("save player.txt");
-                enemyBot.saveEnemyBots();
-                platform.savePlatforms();
-                background.saveBackground();
-                levelState.saveLevelState();
+                game.getEnemyBot().saveEnemyBots();
+                game.getPlatform().savePlatforms(game.getLevelState());
+                game.getGameBackground().saveBackground(game.getLevelState());
+                game.getLevelState().saveLevelState();
             }
         }
 
@@ -56,12 +46,6 @@ public class AutoSave extends JPanel implements ActionListener {
     public void prepareCheckpoints() {
         if (autoSaveLocations.size() > 0) {
             autoSaveLocations.removeAll(autoSaveLocations);
-        }
-    }
-
-    public void addCheckpointByLevel() {
-        if (levelState.getState() == LevelState.LEVEL_1) {
-            addLevel1Checkpoints();
         }
     }
 

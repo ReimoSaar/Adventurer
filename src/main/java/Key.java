@@ -6,6 +6,6 @@ public class Key {
     public boolean isDown;
 
     public void toggle(){
-        isDown =  !isDown;
+        isDown = !isDown;
     }
 }

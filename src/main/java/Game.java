@@ -1,25 +1,39 @@
+import lombok.Getter;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.BatchUpdateException;
+import java.util.ArrayList;
 
 public class Game extends JPanel implements KeyListener, ActionListener, MouseListener {
     private Image dblImage;
     private Graphics dblGraphics;
+    @Getter
     private final Player player;
+
+    @Getter
+    private final LevelStateManager levelState;
+
+    @Getter
     private final Platform platform;
     private final PauseMenu pauseMenu;
+    @Getter
     private final EnemyBot enemyBot;
     private final Timer timer = new Timer(16, this);
+    @Getter
     private final GameStateManager gameState;
     private final Menu menu;
-    private final Background background;
+    @Getter
+    private final Background gameBackground;
     private final FPS fps;
-    private final Bullet bullet;
+    @Getter
+    private ArrayList<Bullet> bullets;
     private final Save save;
     private final DeathMenu deathMenu;
     private final MenuMusic menuMusic;
+    @Getter
     private final Dialogue dialogue;
+    @Getter
     private final AutoSave autoSave;
 
     public Game() {
@@ -27,15 +41,16 @@ public class Game extends JPanel implements KeyListener, ActionListener, MouseLi
         addKeyListener(this);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
+        levelState = new LevelStateManager();
         player = new Player();
         platform = new Platform();
         pauseMenu = new PauseMenu();
         menu = new Menu();
         gameState = new GameStateManager();
         enemyBot = new EnemyBot();
-        background = new Background();
+        gameBackground = new Background();
         fps = new FPS();
-        bullet = new Bullet();
+        bullets = new ArrayList<>();
         save = new Save();
         deathMenu = new DeathMenu();
         menuMusic = new MenuMusic();
@@ -52,36 +67,40 @@ public class Game extends JPanel implements KeyListener, ActionListener, MouseLi
     }
 
     public void paintComponent(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g;
         if (gameState.getState() == GameState.IN_GAME) {
-            background.renderBackground(g);
-            platform.renderPlatforms(g);
-            player.renderPlayer(g);
-            enemyBot.renderEnemyBot(g);
+            gameBackground.renderBackground(g, this, levelState);
+            platform.renderPlatforms(g, this, levelState);
+            bullets.forEach(bullet -> bullet.drawBullet(g2, this));
+            player.renderPlayer(g, this);
+            enemyBot.renderEnemyBot(g, this);
             autoSave.render(g);
         }
         if (gameState.getState() == GameState.MENU) {
-            menu.renderMenu(g);
+            menu.renderMenu(g, this);
         }
         if (gameState.getState() == GameState.PAUSE_MENU) {
-            background.renderBackground(g);
-            platform.renderPlatforms(g);
-            player.renderPlayer(g);
-            pauseMenu.renderPauseMenu(g);
+            gameBackground.renderBackground(g, this, levelState);
+            platform.renderPlatforms(g, this, levelState);
+            bullets.forEach(bullet -> bullet.drawBullet(g2, this));
+            player.renderPlayer(g, this);
+            pauseMenu.renderPauseMenu(g, this);
             autoSave.render(g);
         }
         if (gameState.getState() == GameState.DEATH_MENU) {
-            background.renderBackground(g);
-            platform.renderPlatforms(g);
-            enemyBot.renderEnemyBot(g);
-            deathMenu.renderDeathMenu(g);
+            gameBackground.renderBackground(g, this, levelState);
+            platform.renderPlatforms(g, this, levelState);
+            enemyBot.renderEnemyBot(g, this);
+            deathMenu.renderDeathMenu(g, this);
             autoSave.render(g);
         }
         if (gameState.getState() == GameState.IN_DIALOGUE) {
-            background.renderBackground(g);
-            platform.renderPlatforms(g);
-            player.renderPlayer(g);
-            enemyBot.renderEnemyBot(g);
-            dialogue.renderDialogue(g);
+            gameBackground.renderBackground(g, this, levelState);
+            platform.renderPlatforms(g, this, levelState);
+            bullets.forEach(bullet -> bullet.drawBullet(g2, this));
+            player.renderPlayer(g, this);
+            enemyBot.renderEnemyBot(g, this);
+            dialogue.renderDialogue(g, this);
             autoSave.render(g);
         }
         fps.renderFPS(g);
@@ -90,12 +109,13 @@ public class Game extends JPanel implements KeyListener, ActionListener, MouseLi
 
     public void actionPerformed(ActionEvent e) {
         save.checkFileExistance();
-        menuMusic.playMenuMusic();
+        menuMusic.playMenuMusic(gameState);
         if (gameState.getState() == GameState.MENU) {
             player.preparePlayerObjects();
             platform.relocatePlatforms();
             enemyBot.prepareEnemyBot();
-            background.prepareBackground();
+            gameBackground.prepareBackground();
+            bullets.clear();
             dialogue.prepareDialogue();
             autoSave.prepareCheckpoints();
         }
@@ -103,28 +123,28 @@ public class Game extends JPanel implements KeyListener, ActionListener, MouseLi
             player.loadPlayer();
         }
         if (gameState.getState() == GameState.IN_GAME) {
-            player.actionPerformed(e);
-            enemyBot.actionPerformed(e);
-            platform.actionPerformed(e);
-            background.actionPerformed(e);
-            bullet.actionPerformed(e);
-            dialogue.actionPerformed(e);
-            autoSave.actionPerformed(e);
+            player.update(this);
+            enemyBot.update(this);
+            platform.update(levelState);
+            gameBackground.update(this);
+            bullets.forEach(bullet -> bullet.update(this));
+            bullets.removeIf(bullet -> bullet.isCollided(this));
+            dialogue.update(this);
+            autoSave.update(this);
         }
         fps.actionPerformed(e);
     }
 
     public void keyTyped(KeyEvent e) {
-        player.keyTyped(e);
+
     }
 
     public void keyPressed(KeyEvent e) {
         if (gameState.getState() == GameState.IN_GAME) {
-            player.keyTyped(e);
-            player.keyPressed(e);
+            player.keyPressed(e, this);
         }
         if (gameState.getState() == GameState.IN_GAME || gameState.getState() == GameState.PAUSE_MENU) {
-            pauseMenu.keyPressed(e);
+            pauseMenu.keyPressed(e, gameState);
         }
         if (gameState.getState() == GameState.MENU) {
             menu.keyPressed(e);
@@ -142,22 +162,21 @@ public class Game extends JPanel implements KeyListener, ActionListener, MouseLi
     @Override
     public void mousePressed(MouseEvent e) {
         if (gameState.getState() == GameState.MENU) {
-            menu.mousePressed(e);
+            menu.mousePressed(e, this);
         }
         if (gameState.getState() == GameState.PAUSE_MENU) {
-            pauseMenu.mousePressed(e);
+            pauseMenu.mousePressed(e, this);
         }
         if (gameState.getState() == GameState.DEATH_MENU) {
-            deathMenu.mousePressed(e);
+            deathMenu.mousePressed(e, this);
         }
         if (gameState.getState() == GameState.IN_DIALOGUE) {
-            dialogue.mousePressed(e);
+            dialogue.mousePressed(gameState);
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        dialogue.mouseReleased(e);
     }
 
     @Override

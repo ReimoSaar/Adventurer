@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 
-public class Bullet implements ActionListener {
+public class Bullet {
     private BufferedImage image;
     private Rectangle rectangle;
     private float xVel;
@@ -18,17 +18,6 @@ public class Bullet implements ActionListener {
     private Dimension resolution = Toolkit.getDefaultToolkit().getScreenSize();
     private int screenWidth = resolution.width;
     private int screenHeight = resolution.height;
-    private static ArrayList<Bullet> bullets = new ArrayList<>();
-    private Platform platform;
-    private LevelStateManager levelState;
-    public GameStateManager gameState;
-    private EnemyBot enemyBot;
-
-    public Bullet() {
-        platform = new Platform();
-        levelState = new LevelStateManager();
-        gameState = new GameStateManager();
-    }
 
     public Bullet(BufferedImage image, float x, float y, float width, float height, float xVel, float yVel, boolean isFriendlyBullet) {
         this.image = image;
@@ -43,10 +32,6 @@ public class Bullet implements ActionListener {
         this.yVel = Math.round(resolution.height * yVel);
         this.isFriendlyBullet = isFriendlyBullet;
         this.rectangle = new Rectangle((int) x, (int) y, (int) width, (int) height);
-    }
-
-    public int getBulletCount() {
-        return bullets.size();
     }
 
     public float getXVelocity() {
@@ -69,24 +54,12 @@ public class Bullet implements ActionListener {
         this.image = image;
     }
 
-    public void addBullet(Bullet bullet) {
-        bullets.add(bullet);
-    }
-
-    public void removeBullet(Bullet bullet) {
-        bullets.remove(bullet);
-    }
-
     public Image getImage() {
         return this.image;
     }
 
     public Boolean isFriendlyBullet() {
         return isFriendlyBullet;
-    }
-
-    public ArrayList<Bullet> getBullet() {
-        return bullets;
     }
 
     public Rectangle getRectangle() {
@@ -109,21 +82,17 @@ public class Bullet implements ActionListener {
         return this.rectangle.intersection(rectangle);
     }
 
-    public void detectCollision() {
-        for (RectangleImage platform : platform.getPlatformLevels()) {
-            getBullet().removeIf(bullet -> bullet.rectangle.intersects(platform.getRectangle()) ||
-                    bullet.rectangle.x > screenWidth || bullet.rectangle.x < 0);
+    public boolean isCollided(Game game) {
+        for (RectangleImage platforms : game.getPlatform().getPlatformLevels(game.getLevelState())) {
+            if (this.rectangle.intersects(platforms.getRectangle()) ||
+                    this.rectangle.x > screenWidth || this.rectangle.x < 0) {
+                return true;
+            }
         }
+        return false;
     }
 
-    public void removeAllBullets() {
-        getBullet().removeAll(bullets);
-    }
-
-    public void actionPerformed(ActionEvent e) {
-        for (int i = 0; i < getBulletCount(); i++) {
-            bullets.get(i).getRectangle().x += platform.getxVel() + bullets.get(i).getXVelocity();
-        }
-        detectCollision();
+    public void update(Game game) {
+        this.rectangle.x += game.getPlatform().getxVel() + this.getXVelocity();
     }
 }

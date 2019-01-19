@@ -1,3 +1,6 @@
+import lombok.Getter;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -5,6 +8,7 @@ import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 import java.nio.Buffer;
+import java.util.ArrayList;
 
 public class Character {
     private BufferedImage image;
@@ -12,7 +16,9 @@ public class Character {
     private float standingLocation;
     private float xVel;
     private float yVel;
+    @Getter
     private float x;
+    @Getter
     private float y;
     private BufferedImage standing;
     private BufferedImage shooting;
@@ -30,15 +36,12 @@ public class Character {
     public float animChangeDistance;
     public boolean hasCrossedACD = false;
     private boolean isFacingLeft;
-    private Bullet bullet;
-    private BufferedImageLoader loader;
     private int shootTime = 0;
     private int reactionTime;
 
     private int maxHealth;
     private Bar healthBar;
 
-    private Platform platform;
     private AudioPlayer shootingSound;
 
     public Character(BufferedImage standing, BufferedImage shooting, Animation right, Animation left, float x, float y, float width, float height, int health) {
@@ -56,7 +59,6 @@ public class Character {
         standingLocation = this.x;
         animChangeDistance = this.x;
         this.rectangle = new Rectangle((int) x, (int) y, (int) width, (int) height);
-        platform = new Platform();
     }
 
     public Character(BufferedImage standing, BufferedImage shooting, Animation right, Animation left,
@@ -81,9 +83,6 @@ public class Character {
         maxHealth = health;
         this.reactionTime = reactionTime;
         this.rectangle = new Rectangle((int) x, (int) y, (int) width, (int) height);
-        platform = new Platform();
-        bullet = new Bullet();
-        loader = new BufferedImageLoader();
         shootingSound = new AudioPlayer("SFX/shoot.wav");
     }
 
@@ -93,14 +92,6 @@ public class Character {
 
     public int getMaxHealth() {
         return maxHealth;
-    }
-
-    public float getX() {
-        return this.x;
-    }
-
-    public float getY() {
-        return this.y;
     }
 
     public void setImage(BufferedImage image) {
@@ -163,12 +154,12 @@ public class Character {
         return (float) (standingLocation / screenWidth);
     }
 
-    public void moveCharacter() {
-        rectangle.x += platform.getxVel() + xVel;
-        standingLocation += platform.getxVel();
-        animChangeDistance += platform.getxVel();
+    public void moveCharacter(Game game) {
+        rectangle.x += game.getPlatform().getxVel() + xVel;
+        standingLocation += game.getPlatform().getxVel();
+        animChangeDistance += game.getPlatform().getxVel();
         rectangle.y += yVel;
-        for (RectangleImage platforms : platform.getPlatformLevels()) {
+        for (RectangleImage platforms : game.getPlatform().getPlatformLevels(game.getLevelState())) {
             if (getRectangle().intersects(platforms.getRectangle())) {
 
                 //on platform interaction
@@ -209,7 +200,7 @@ public class Character {
         yVel += Constants.GRAVITY * screenHeight;
     }
 
-    public void movePlayer(float xVel) {
+    public void movePlayer(float xVel, Platform platform) {
         rectangle.x += xVel;
         standingLocation += platform.getxVel();
         animChangeDistance += platform.getxVel();
@@ -359,7 +350,7 @@ public class Character {
         }
     }
 
-    public void addShooting(String path, float width, float height, float xVel, float yVel, boolean friendly) {
+    public void addShooting(String path, ArrayList<Bullet> bullets, float width, float height, float xVel, float yVel, boolean friendly) {
         if (this.xVel > 0) {
             isFacingLeft = false;
         }
@@ -378,28 +369,28 @@ public class Character {
         if (shootTime == 0) {
             shootingSound.play();
             if (isFacingLeft) {
-                bullet.addBullet(new Bullet(loader.loadBufferedImage(path), rectangle.x + rectangle.width,
+                bullets.add(new Bullet(BufferedImageLoader.loadBufferedImage(path), rectangle.x,
                         rectangle.y + rectangle.height / 3.0f, width, height, -xVel, yVel, friendly));
             }
             if (!isFacingLeft) {
-                bullet.addBullet(new Bullet(loader.loadBufferedImage(path), rectangle.x + rectangle.width,
+                bullets.add(new Bullet(BufferedImageLoader.loadBufferedImage(path), rectangle.x + rectangle.width,
                         rectangle.y + rectangle.height / 3.0f, width, height, xVel, yVel, friendly));
             }
         }
     }
 
-    public void addJumping() {
-        if (canJump() && isJumpAvailable()) {
+    public void addJumping(Game game) {
+        if (canJump(game) && isJumpAvailable(game)) {
             yVel = screenHeight * Constants.JUMP_POWER;
         }
     }
 
-    private boolean canJump() {
-        for (RectangleImage platform : platform.getPlatformLevels()) {
-            if (rectangle.x + rectangle.width > platform.getRectangle().x && rectangle.x < platform.getRectangle().x + platform.getRectangle().width &&
-                    rectangle.y + rectangle.height == platform.getRectangle().y) {
-                if (rectangle.x > platform.getRectangle().x + platform.getRectangle().width - rectangle.width && xVel > 0 ||
-                        rectangle.x < platform.getRectangle().x && xVel < 0) {
+    private boolean canJump(Game game) {
+        for (RectangleImage platforms : game.getPlatform().getPlatformLevels(game.getLevelState())) {
+            if (rectangle.x + rectangle.width > platforms.getRectangle().x && rectangle.x < platforms.getRectangle().x + platforms.getRectangle().width &&
+                    rectangle.y + rectangle.height == platforms.getRectangle().y) {
+                if (rectangle.x > platforms.getRectangle().x + platforms.getRectangle().width - rectangle.width && xVel > 0 ||
+                        rectangle.x < platforms.getRectangle().x && xVel < 0) {
                     return true;
                 }
             }
@@ -407,8 +398,8 @@ public class Character {
         return false;
     }
 
-    private boolean isJumpAvailable() {
-        for (RectangleImage platforms : platform.getPlatformLevels()) {
+    private boolean isJumpAvailable(Game game) {
+        for (RectangleImage platforms : game.getPlatform().getPlatformLevels(game.getLevelState())) {
             if (rectangle.y == (int) (platforms.getRectangle().y - rectangle.getHeight())) {
                 return true;
             }

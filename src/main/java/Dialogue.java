@@ -1,33 +1,25 @@
-import javax.swing.*;
+
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 
-public class Dialogue extends JPanel implements MouseListener, ActionListener {
-    GameStateManager gameState;
+public class Dialogue {
     private static ArrayList<Checkpoint> dialogueLocations;
-    private ArrayList<Checkpoint> passedDialogueLocations;
     private RectangleImage dialogueBackground;
-    private Platform platform;
     private boolean canRemove = false;
     private int counter = 0;
 
 
     public Dialogue() {
         dialogueBackground = new RectangleImage(GameImage.getImage("dialogue_box"), 0.0f, 0.8f, 1.0f, 0.2f);
-        platform = new Platform();
-        gameState = new GameStateManager();
         dialogueLocations = new ArrayList<>();
     }
 
-    public void renderDialogue(Graphics g) {
+    public void renderDialogue(Graphics g, ActionListener imageObserver) {
         Graphics2D g2 = (Graphics2D) g;
-        dialogueBackground.draw(g2, this);
-        addText(g);
+        dialogueBackground.draw(g2, imageObserver);
+        addText(g, imageObserver);
     }
 
     public void addLevel1Dialogues() {
@@ -41,17 +33,17 @@ public class Dialogue extends JPanel implements MouseListener, ActionListener {
         dialogueLocations.add(new Checkpoint(1.9f, "nice!", 0, GameImage.getImage("enemy_dialogue_image")));
     }
 
-    public void addDialogueInteraction() {
+    public void addDialogueInteraction(Game game) {
         if (canRemove) {
             dialogueLocations.removeIf(dialogueCheck -> Player.getPlayer().getRectangle().x >= dialogueCheck.rectangle.x);
         }
 
         if (hasPassedDialogueCheck()) {
-            gameState.setState(GameState.IN_DIALOGUE);
+            game.getGameState().setState(GameState.IN_DIALOGUE);
         }
 
         for (Checkpoint checkPoint : dialogueLocations) {
-            checkPoint.rectangle.x += platform.getxVel();
+            checkPoint.rectangle.x += game.getPlatform().getxVel();
         }
     }
 
@@ -59,16 +51,16 @@ public class Dialogue extends JPanel implements MouseListener, ActionListener {
         dialogueLocations.removeAll(dialogueLocations);
     }
 
-    private void addText(Graphics g) {
+    private void addText(Graphics g, ActionListener imageObserver) {
         for (Checkpoint checkPoint : dialogueLocations) {
             if (checkPoint.turn == counter) {
-                checkPoint.addText(g, this);
+                checkPoint.addText(g, imageObserver);
             }
         }
     }
 
-    public void actionPerformed(ActionEvent e) {
-        addDialogueInteraction();
+    public void update(Game game) {
+        addDialogueInteraction(game);
     }
 
     public boolean hasPassedDialogueCheck() {
@@ -80,13 +72,7 @@ public class Dialogue extends JPanel implements MouseListener, ActionListener {
         return false;
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed(GameStateManager gameState) {
         Checkpoint check = null;
         for (Checkpoint checkPoint : dialogueLocations) {
             if (Player.getPlayer().getRectangle().x >= checkPoint.rectangle.x) {
@@ -104,21 +90,6 @@ public class Dialogue extends JPanel implements MouseListener, ActionListener {
                 gameState.setState(GameState.IN_GAME);
             }
         }
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        canRemove = false;
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-
     }
 
     private class Checkpoint {
