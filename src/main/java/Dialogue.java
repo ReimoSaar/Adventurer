@@ -16,7 +16,7 @@ public class Dialogue {
         dialogueLocations = new ArrayList<>();
     }
 
-    public void renderDialogue(Graphics g, ActionListener imageObserver) {
+    public void renderDialogue(Graphics g, ImageObserver imageObserver) {
         Graphics2D g2 = (Graphics2D) g;
         dialogueBackground.draw(g2, imageObserver);
         addText(g, imageObserver);
@@ -51,7 +51,7 @@ public class Dialogue {
         dialogueLocations.removeAll(dialogueLocations);
     }
 
-    private void addText(Graphics g, ActionListener imageObserver) {
+    private void addText(Graphics g, ImageObserver imageObserver) {
         for (Checkpoint checkPoint : dialogueLocations) {
             if (checkPoint.turn == counter) {
                 checkPoint.addText(g, imageObserver);
@@ -111,7 +111,7 @@ public class Dialogue {
             screenHeight = resolution.height;
         }
 
-        private void addText(Graphics g, ActionListener imageObserver) {
+        private void addText(Graphics g, ImageObserver imageObserver) {
             Graphics2D g2 = (Graphics2D) g;
             if (rectangle.x <= Player.getPlayer().getRectangle().x) {
                 new Text(g, string, 0.1f, 0.9f, 20, "arial", Color.BLACK, Font.BOLD);

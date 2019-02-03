@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.ImageObserver;
 
 public class PauseMenu {
 
@@ -31,7 +32,7 @@ public class PauseMenu {
                 my >= rectangleImage.getRectangle().y && my <= rectangleImage.getRectangle().y + rectangleImage.getRectangle().height;
     }
 
-    public void renderPauseMenu(Graphics g, ActionListener imageObserver) {
+    public void renderPauseMenu(Graphics g, ImageObserver imageObserver) {
         Graphics2D g2 = (Graphics2D) g;
         pauseBackground.draw(g2, imageObserver);
         resume.draw(g2, imageObserver);

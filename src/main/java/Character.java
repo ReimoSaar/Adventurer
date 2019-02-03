@@ -310,8 +310,8 @@ public class Character {
         }
     }
 
-    public void drawCharacter(Graphics g2, ActionListener imageObserver) {
-        g2.drawImage(currentImage, rectangle.x, rectangle.y, rectangle.width, rectangle.height, (ImageObserver) imageObserver);
+    public void drawCharacter(Graphics g2, ImageObserver imageObserver) {
+        g2.drawImage(currentImage, rectangle.x, rectangle.y, rectangle.width, rectangle.height, imageObserver);
     }
 
     public void addHealthBar() {

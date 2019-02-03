@@ -29,7 +29,7 @@ public class Menu {
         stage2 = new RectangleImage(GameImage.getImage("menu/stage_1"), 0.45f, 0.3f, 0.1f, 0.1f);
     }
 
-    public void renderMenu(Graphics g, ActionListener imageObserver) {
+    public void renderMenu(Graphics g, ImageObserver imageObserver) {
         Graphics2D g2 = (Graphics2D) g;
         menuBackground.draw(g2, imageObserver);
         if (showMainButtons) {

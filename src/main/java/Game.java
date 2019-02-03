@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-public class Game extends JPanel implements KeyListener, ActionListener, MouseListener {
+public class Game extends JPanel implements KeyListener, MouseListener, Runnable {
     private Image dblImage;
     private Graphics dblGraphics;
     @Getter
@@ -19,7 +19,6 @@ public class Game extends JPanel implements KeyListener, ActionListener, MouseLi
     private final PauseMenu pauseMenu;
     @Getter
     private final EnemyBot enemyBot;
-    private final Timer timer = new Timer(16, this);
     @Getter
     private final GameStateManager gameState;
     private final Menu menu;
@@ -35,6 +34,9 @@ public class Game extends JPanel implements KeyListener, ActionListener, MouseLi
     private final Dialogue dialogue;
     @Getter
     private final AutoSave autoSave;
+
+    private int FPS = 60;
+    private double averageFPS;
 
     public Game() {
         addMouseListener(this);
@@ -56,7 +58,6 @@ public class Game extends JPanel implements KeyListener, ActionListener, MouseLi
         menuMusic = new MenuMusic();
         dialogue = new Dialogue();
         autoSave = new AutoSave();
-        timer.start();
     }
 
     public void paint(Graphics g) {
@@ -132,7 +133,7 @@ public class Game extends JPanel implements KeyListener, ActionListener, MouseLi
             dialogue.update(this);
             autoSave.update(this);
         }
-        fps.actionPerformed(e);
+        fps.update();
     }
 
     public void keyTyped(KeyEvent e) {
@@ -187,5 +188,62 @@ public class Game extends JPanel implements KeyListener, ActionListener, MouseLi
     @Override
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    @Override
+    public void run() {
+        long startTime;
+        long URDTimeMillis;
+        long waitTime;
+        long totalTime = 0;
+
+        int frameCount = 0;
+        int maxFrameCount = 30;
+
+        long targetTime = 1000 / FPS;
+
+        while (true) {
+            startTime = System.nanoTime();
+            save.checkFileExistance();
+            menuMusic.playMenuMusic(gameState);
+            if (gameState.getState() == GameState.MENU) {
+                player.preparePlayerObjects();
+                platform.relocatePlatforms();
+                enemyBot.prepareEnemyBot();
+                gameBackground.prepareBackground();
+                bullets.clear();
+                dialogue.prepareDialogue();
+                autoSave.prepareCheckpoints();
+            }
+            if (Player.loadPlayer) {
+                player.loadPlayer();
+            }
+            if (gameState.getState() == GameState.IN_GAME) {
+                player.update(this);
+                enemyBot.update(this);
+                platform.update(levelState);
+                gameBackground.update(this);
+                bullets.forEach(bullet -> bullet.update(this));
+                bullets.removeIf(bullet -> bullet.isCollided(this));
+                dialogue.update(this);
+                autoSave.update(this);
+            }
+            fps.update();
+
+            URDTimeMillis = (System.nanoTime() - startTime) / 1000000;
+            waitTime = targetTime - URDTimeMillis;
+            try {
+                Thread.sleep(Math.max(0, waitTime));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            totalTime += System.nanoTime() - startTime;
+            frameCount++;
+            if (frameCount == maxFrameCount) {
+                averageFPS = 1000.0 / (((double)totalTime / frameCount) / 1000000);
+                frameCount = 0;
+                totalTime = 0;
+            }
+        }
     }
 }

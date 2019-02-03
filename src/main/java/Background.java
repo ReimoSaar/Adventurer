@@ -43,7 +43,7 @@ public class Background {
         return backgounds;
     }
 
-    public void renderBackground(Graphics g, ActionListener imageObserver, LevelStateManager levelState) {
+    public void renderBackground(Graphics g, ImageObserver imageObserver, LevelStateManager levelState) {
         Graphics2D g2 = (Graphics2D) g;
         for (RectangleImage backgrounds : getAllBackgrounds(levelState)) {
             backgrounds.draw(g2, imageObserver);

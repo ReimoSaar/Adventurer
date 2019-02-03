@@ -59,7 +59,7 @@ public class Player {
         save = new Save();
     }
 
-    public void renderPlayer(Graphics g, ActionListener imageObserver) {
+    public void renderPlayer(Graphics g, ImageObserver imageObserver) {
         new Text(g, player.getHealth() + "", 0.1f, 0.6f, 30, "arial", Color.RED, 1);
         Graphics2D g2 = (Graphics2D) g;
         player.drawCharacter(g2, imageObserver);

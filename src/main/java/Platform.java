@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.ImageObserver;
 import java.io.*;
 import java.util.ArrayList;
 
@@ -61,7 +62,7 @@ public class Platform {
         return platformxVel;
     }
 
-    public void renderPlatforms(Graphics g, ActionListener imageObserver, LevelStateManager levelState) {
+    public void renderPlatforms(Graphics g, ImageObserver imageObserver, LevelStateManager levelState) {
         Graphics2D g2 = (Graphics2D) g;
         for (RectangleImage platforms : getPlatformLevels(levelState)) {
             platforms.draw(g2, imageObserver);

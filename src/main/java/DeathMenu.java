@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.ImageObserver;
 
 public class DeathMenu {
     private RectangleImage restart;
@@ -11,7 +12,7 @@ public class DeathMenu {
         pauseBackground = new RectangleImage(GameImage.getImage("pausemenu_background"), 0.0f, 0.0f, 1.0f, 1.0f);
     }
 
-    public void renderDeathMenu(Graphics g, ActionListener imageObserver) {
+    public void renderDeathMenu(Graphics g, ImageObserver imageObserver) {
         Graphics2D g2 = (Graphics2D) g;
         pauseBackground.draw(g2, imageObserver);
         restart.draw(g2, imageObserver);

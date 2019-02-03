@@ -54,8 +54,8 @@ public class RectangleImage {
         this.rectangle.setBounds(x, y, rectangle.width, rectangle.height);
     }
 
-    public void draw(Graphics2D g2, ActionListener imageObserver) {
-        g2.drawImage(this.image, this.rectangle.x, this.rectangle.y, this.rectangle.width, this.rectangle.height, (ImageObserver) imageObserver);
+    public void draw(Graphics2D g2, ImageObserver imageObserver) {
+        g2.drawImage(this.image, this.rectangle.x, this.rectangle.y, this.rectangle.width, this.rectangle.height, imageObserver);
     }
 
     public boolean intersects(Rectangle rectangle) {

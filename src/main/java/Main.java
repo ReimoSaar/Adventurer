@@ -11,6 +11,8 @@ public class Main {
         obj.setUndecorated(true);
         obj.setVisible(true);
         obj.setResizable(false);
+        obj.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         obj.add(game);
+        game.run();
     }
 }

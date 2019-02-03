@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 
+import java.awt.image.ImageObserver;
 import java.io.*;
 import java.util.ArrayList;
 
@@ -91,7 +92,7 @@ public class EnemyBot {
         return enemies;
     }
 
-    public void renderEnemyBot(Graphics g, ActionListener imageObserver) {
+    public void renderEnemyBot(Graphics g, ImageObserver imageObserver) {
         Graphics2D g2 = (Graphics2D) g;
         for (Character enemyBots : getAllEnemyBots()) {
             enemyBots.drawCharacter(g2, imageObserver);
