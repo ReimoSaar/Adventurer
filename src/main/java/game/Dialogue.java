@@ -29,14 +29,14 @@ public class Dialogue {
     }
 
     public void addLevel1Dialogues() {
-        dialogueLocations.add(new Checkpoint(0.9f, "Reimo", 0, GameImage.getImage("player_dialogue_image")));
-        dialogueLocations.add(new Checkpoint(0.9f, "wddw", 1, GameImage.getImage("enemy_dialogue_image")));
-        dialogueLocations.add(new Checkpoint(0.9f, "wdddsadaw", 2, GameImage.getImage("enemy_dialogue_image")));
-        dialogueLocations.add(new Checkpoint(1.4f, "XD", 0, GameImage.getImage("player_dialogue_image")));
-        dialogueLocations.add(new Checkpoint(1.4f, "LOL", 1, GameImage.getImage("enemy_dialogue_image")));
-        dialogueLocations.add(new Checkpoint(1.4f, "wddw", 2, GameImage.getImage("player_dialogue_image")));
-        dialogueLocations.add(new Checkpoint(1.4f, "wdddsadaw", 3, GameImage.getImage("player_dialogue_image")));
-        dialogueLocations.add(new Checkpoint(1.9f, "nice!", 0, GameImage.getImage("enemy_dialogue_image")));
+        dialogueLocations.add(new Checkpoint(0.9f, "dialogue1", 0, GameImage.getImage("player_dialogue_image")));
+        dialogueLocations.add(new Checkpoint(0.9f, "dialogue2", 1, GameImage.getImage("enemy_dialogue_image")));
+        dialogueLocations.add(new Checkpoint(0.9f, "dialogue3", 2, GameImage.getImage("enemy_dialogue_image")));
+        dialogueLocations.add(new Checkpoint(1.4f, "dialogue4", 0, GameImage.getImage("player_dialogue_image")));
+        dialogueLocations.add(new Checkpoint(1.4f, "dialogue5", 1, GameImage.getImage("enemy_dialogue_image")));
+        dialogueLocations.add(new Checkpoint(1.4f, "dialogue6", 2, GameImage.getImage("player_dialogue_image")));
+        dialogueLocations.add(new Checkpoint(1.4f, "dialogue7", 3, GameImage.getImage("player_dialogue_image")));
+        dialogueLocations.add(new Checkpoint(1.9f, "dialogue8", 0, GameImage.getImage("enemy_dialogue_image")));
     }
 
     public void addDialogueInteraction() {

@@ -59,7 +59,7 @@ public class Player {
     }
 
     public void renderPlayer(Graphics g, ImageObserver imageObserver) {
-        new Text(g, player.getHealth() + "", 0.1f, 0.6f, 30, "arial", Color.RED, 1);
+        new Text(g, player.getHealth() + "", 0.37f, 0.84f, 30, "arial", Color.RED, 1);
         Graphics2D g2 = (Graphics2D) g;
         player.draw(g2, imageObserver);
         healthBar = new Bar(Constants.PLAYER_MAX_HEALTH, player.getHealth(), Color.RED, Color.WHITE,
