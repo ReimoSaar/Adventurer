@@ -8,7 +8,7 @@ public class FPS {
     private int totalFrames = 0;
 
     public void renderFPS(Graphics g) {
-         new Text(g, "game.FPS:" + currentFPS, 0.01f, 0.03f, 20, "arial", Color.BLACK, Font.BOLD);
+         new Text(g, "FPS:" + currentFPS, 0.01f, 0.03f, 20, "arial", Color.BLACK, Font.BOLD);
         }
 
     public void update() {

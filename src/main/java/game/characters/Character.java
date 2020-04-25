@@ -173,21 +173,13 @@ public class Character {
         g2.drawImage(standing, rectangle.x, rectangle.y, rectangle.width, rectangle.height, (ImageObserver) imageObserver);
     }
 
-    public float getACD() {
-        return animChangeDistance;
-    }
-
-    public void setACD(float ACD) {
-        animChangeDistance = ACD;
-    }
-
     public void changePlayerImg(float xVel, float pXVel) {
         if (xVel == 0) {
             currentImage = standing;
         }
         if (xVel > 0 || pXVel < 0) {
-            if (rectangle.x >= getACD()) {
-                setACD(animChangeDistance + change);
+            if (rectangle.x >= getAnimChangeDistance()) {
+                setAnimChangeDistance(animChangeDistance + change);
                 counter++;
             }
             switch (counter) {
@@ -206,8 +198,8 @@ public class Character {
             }
         }
         if (xVel < 0) {
-            if (rectangle.x <= getACD()) {
-                setACD(animChangeDistance -= change);
+            if (rectangle.x <= getAnimChangeDistance()) {
+                setAnimChangeDistance(animChangeDistance -= change);
                 counter++;
             }
             switch (counter) {
@@ -232,8 +224,8 @@ public class Character {
             currentImage = standing;
         }
         if (xVel > 0) {
-            if (rectangle.x >= getACD()) {
-                setACD(animChangeDistance + change);
+            if (rectangle.x >= getAnimChangeDistance()) {
+                setAnimChangeDistance(animChangeDistance + change);
                 counter++;
             }
             switch (counter) {
@@ -251,8 +243,8 @@ public class Character {
                     break;
             }
         } else if (xVel < 0) {
-            if (rectangle.x <= getACD()) {
-                setACD(animChangeDistance - change);
+            if (rectangle.x <= getAnimChangeDistance()) {
+                setAnimChangeDistance(animChangeDistance - change);
                 counter++;
             }
             switch (counter) {

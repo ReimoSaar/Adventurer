@@ -73,6 +73,7 @@ public class Player {
         }
         player.getRectangle().y += playeryVel;
         player.getRectangle().x += playerxVel;
+        player.setAnimChangeDistance(player.animChangeDistance += game.getPlatform().getxVel());
 
         for (RectangleImage platforms : game.getPlatform().getPlatformLevels(game.getLevelState())) {
             platformHeight = (int) (platforms.getRectangle().y - player.getRectangle().getHeight());
@@ -195,6 +196,7 @@ public class Player {
             case KeyEvent.VK_D:
                 isFacingLeft = false;
                 rightKeyDown = true;
+
                 break;
             case KeyEvent.VK_A:
                 isFacingLeft = true;

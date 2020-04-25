@@ -4,14 +4,15 @@ import game.characters.Player;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class AutoSave {
     private Save saveGame;
-    private static ArrayList<Checkpoint> autoSaveLocations;
+    private static List<Checkpoint> autoSaveLocations = Collections.synchronizedList(new ArrayList<>());
 
     public AutoSave() {
         saveGame = new Save();
-        autoSaveLocations = new ArrayList<>();
     }
 
     public void update(Game game) {

@@ -45,7 +45,6 @@ public class Background {
             }
 
             backgrounds.getRectangle().x += game.getPlatform().getxVel() / 2;
-            System.out.println(getAllBackgrounds(game.getLevelState()).get(0).getRectangle().x - getAllBackgrounds(game.getLevelState()).get(1).getRectangle().x);
         }
     }
 
